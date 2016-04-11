@@ -24,7 +24,7 @@ var (
 				Name:        "ttl",
 				Value:       ttl,
 				Usage:       "time to live in store",
-				Destination: &heartbeat,
+				Destination: &ttl,
 			},
 		},
 	}
