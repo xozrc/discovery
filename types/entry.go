@@ -5,13 +5,13 @@ import (
 )
 
 var (
-	EntryFactoryInstance EntryFactory
-    HostEntryFactoryInstance EntryFactory
+	EntryFactoryInstance     EntryFactory
+	HostEntryFactoryInstance EntryFactory
 )
 
 func init() {
 	EntryFactoryInstance = EntryFactoryFunc(createEntry)
-    HostEntryFactoryInstance = EntryFactoryFunc(createHostEntry)
+	HostEntryFactoryInstance = EntryFactoryFunc(createHostEntry)
 }
 
 type Entries []Entry
@@ -39,22 +39,21 @@ func (eff EntryFactoryFunc) CreateEntry() Entry {
 	return eff()
 }
 
-type entry string
+type StringEntry string
 
-func (e *entry) Marshal() ([]byte, error) {
-	return []byte(*e),nil
+func (e *StringEntry) Marshal() ([]byte, error) {
+	return []byte(*e), nil
 }
 
-func (e *entry) Unmarshal(data []byte) error {
-	*e = entry(string(data))
-    return nil
+func (e *StringEntry) Unmarshal(data []byte) error {
+	*e = StringEntry(string(data))
+	return nil
 }
 
 func createEntry() Entry {
-    te := entry("")
+	te := StringEntry("")
 	return &te
 }
-
 
 type HostEntry struct {
 	Host string `json:"host"`
@@ -69,6 +68,6 @@ func (e *HostEntry) Unmarshal(data []byte) error {
 	return json.Unmarshal(data, e)
 }
 
-func createHostEntry() Entry{
-       return &HostEntry{}
+func createHostEntry() Entry {
+	return &HostEntry{}
 }

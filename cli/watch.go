@@ -15,9 +15,9 @@ var (
 )
 var (
 	watchCmd = cli.Command{
-		Name:        "watch",
-		Aliases:     []string{"w"},
-		Usage:       "watch --heartbeat=${heartbeat(second)}",
+		Name: "watch",
+
+		Usage:       "watch --heartbeat=${heartbeat(second)} srvName",
 		Description: "watch specific service",
 		Action:      watch,
 		Flags: []cli.Flag{
