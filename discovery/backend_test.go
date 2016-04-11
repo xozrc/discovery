@@ -26,7 +26,7 @@ func TestWatch(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	ms := mock_store.NewMockStore(ctrl)
-	bke := discovery.NewBackend(ms, types.EntryFactoryInstance, prefix, serviceName, ttl, heartbeat)
+	bke := discovery.NewBackend(ms, types.EntryFactoryInstance, prefix, serviceName, heartbeat)
 	testWatch(t, bke)
 	testWatchError(t, bke)
 }
@@ -51,7 +51,7 @@ func TestUnwatch(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	ms := mock_store.NewMockStore(ctrl)
-	bke := discovery.NewBackend(ms, types.EntryFactoryInstance, prefix, serviceName, ttl, heartbeat)
+	bke := discovery.NewBackend(ms, types.EntryFactoryInstance, prefix, serviceName, heartbeat)
 	testUnwatch(t, bke)
 	testUnwatchError(t, bke)
 }

@@ -2,31 +2,38 @@ package discovery
 
 import (
 	"fmt"
+	"log"
 	"path"
 	"sync"
 	"time"
 )
-
 import (
+	"github.com/docker/docker/pkg/tlsconfig"
+	"github.com/docker/libkv"
 	store "github.com/docker/libkv/store"
+	"github.com/docker/libkv/store/etcd"
+
 	types "github.com/xozrc/discovery/types"
 )
 
+func init() {
+	etcd.Register()
+}
+
 // discovery backend
 type DiscoveryBackend interface {
-	Register(entry types.Entry) error
+	Register(entry types.Entry, ttl time.Duration) error
 	Deregister(entry types.Entry) error
 	Watch() (chan types.Entries, chan error, error)
 	Unwatch() error
 }
 
-func NewBackend(s store.Store, ef types.EntryFactory, p string, serv string, ttl time.Duration, hb time.Duration) DiscoveryBackend {
+func NewBackend(s store.Store, ef types.EntryFactory, p string, serv string, hb time.Duration) DiscoveryBackend {
 	edb := &discoveryBackend{
 		store:        s,
 		entryFactory: ef,
 		prefix:       p,
 		service:      serv,
-		ttl:          ttl,
 		heartbeat:    hb,
 	}
 	return edb
@@ -41,11 +48,10 @@ type discoveryBackend struct {
 	prefix string
 	//service name
 	service string
-	//ttl
-	ttl time.Duration
 	//heartbeat
 	heartbeat time.Duration
-	mu        sync.RWMutex
+	//lock for watch and unwatch
+	mu sync.RWMutex
 	//path
 	path string
 	//watch stop channel
@@ -53,8 +59,8 @@ type discoveryBackend struct {
 }
 
 //register
-func (edb *discoveryBackend) Register(entry types.Entry) (err error) {
-	opts := &store.WriteOptions{TTL: edb.ttl}
+func (edb *discoveryBackend) Register(entry types.Entry, ttl time.Duration) (err error) {
+	opts := &store.WriteOptions{TTL: ttl}
 	tb, err := entry.Marshal()
 	if err != nil {
 		return
@@ -142,16 +148,21 @@ func (edb *discoveryBackend) Watch() (entriesCh chan types.Entries, errCh chan e
 				select {
 				case pairs := <-watchCh:
 					{
+
 						entries := make([]types.Entry, len(pairs))
-						for _, kv := range pairs {
+
+						for i, kv := range pairs {
+
 							te := edb.entryFactory.CreateEntry()
 							err = te.Unmarshal([]byte(kv.Value))
+
 							if err != nil {
 								errCh <- err
 								continue
 							}
-							entries = append(entries, te)
+							entries[i] = te
 						}
+
 						entriesCh <- types.Entries(entries)
 					}
 				case <-edb.stopCh:
@@ -183,4 +194,36 @@ func (edb *discoveryBackend) Unwatch() error {
 //if watch
 func (edb *discoveryBackend) isWatch() bool {
 	return edb.stopCh != nil
+}
+
+func NewEtcdStore(cafile, certfile, keyfile string, addrs []string) (store.Store, error) {
+
+	var config *store.Config
+	if cafile != "" && certfile != "" && keyfile != "" {
+		log.Println("Initializing discovery with TLS")
+		tlsConfig, err := tlsconfig.Client(tlsconfig.Options{
+			CAFile:   cafile,
+			CertFile: certfile,
+			KeyFile:  keyfile,
+		})
+		if err != nil {
+			return nil, err
+		}
+		config = &store.Config{
+			// Set ClientTLS to trigger https (bug in libkv/etcd)
+			ClientTLS: &store.ClientTLSConfig{
+				CACertFile: cafile,
+				CertFile:   certfile,
+				KeyFile:    keyfile,
+			},
+			// The actual TLS config that will be used
+			TLS: tlsConfig,
+		}
+	} else {
+		log.Println("Initializing discovery without TLS")
+
+	}
+
+	s, err := libkv.NewStore(store.ETCD, addrs, config)
+	return s, err
 }

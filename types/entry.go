@@ -4,6 +4,16 @@ import (
 	"encoding/json"
 )
 
+var (
+	EntryFactoryInstance EntryFactory
+    HostEntryFactoryInstance EntryFactory
+)
+
+func init() {
+	EntryFactoryInstance = EntryFactoryFunc(createEntry)
+    HostEntryFactoryInstance = EntryFactoryFunc(createHostEntry)
+}
+
 type Entries []Entry
 
 type Entry interface {
@@ -29,27 +39,36 @@ func (eff EntryFactoryFunc) CreateEntry() Entry {
 	return eff()
 }
 
-type entry struct {
+type entry string
+
+func (e *entry) Marshal() ([]byte, error) {
+	return []byte(*e),nil
+}
+
+func (e *entry) Unmarshal(data []byte) error {
+	*e = entry(string(data))
+    return nil
+}
+
+func createEntry() Entry {
+    te := entry("")
+	return &te
+}
+
+
+type HostEntry struct {
 	Host string `json:"host"`
 	Port int    `json:"port"`
 }
 
-func (e *entry) Marshal() ([]byte, error) {
+func (e *HostEntry) Marshal() ([]byte, error) {
 	return json.Marshal(e)
 }
 
-func (e *entry) Unmarshal(data []byte) error {
+func (e *HostEntry) Unmarshal(data []byte) error {
 	return json.Unmarshal(data, e)
 }
 
-func CreateEntry() Entry {
-	return &entry{}
-}
-
-var (
-	EntryFactoryInstance EntryFactory
-)
-
-func init() {
-	EntryFactoryInstance = EntryFactoryFunc(CreateEntry)
+func createHostEntry() Entry{
+       return &HostEntry{}
 }
