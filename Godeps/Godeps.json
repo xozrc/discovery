@@ -1,0 +1,49 @@
+{
+	"ImportPath": "github.com/xozrc/discovery",
+	"GoVersion": "go1.5.3",
+	"Deps": [
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.9.0-15-g219c8cb",
+			"Rev": "219c8cb75c258c552e999735be6df753ffc7afdc"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.2.0-237-g71f57d3",
+			"Rev": "71f57d300dd6a780ac1856c005c4b518cfd498ec"
+		},
+		{
+			"ImportPath": "github.com/coreos/etcd/client",
+			"Comment": "v2.3.0-322-gaf1b3f0",
+			"Rev": "af1b3f061ae8073610a1af285b4b088743eedbe0"
+		},
+		{
+			"ImportPath": "github.com/coreos/etcd/pkg/pathutil",
+			"Comment": "v2.3.0-322-gaf1b3f0",
+			"Rev": "af1b3f061ae8073610a1af285b4b088743eedbe0"
+		},
+		{
+			"ImportPath": "github.com/coreos/etcd/pkg/types",
+			"Comment": "v2.3.0-322-gaf1b3f0",
+			"Rev": "af1b3f061ae8073610a1af285b4b088743eedbe0"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/tlsconfig",
+			"Comment": "v1.4.1-10513-g187a2fb",
+			"Rev": "187a2fb40390f52a45e5b77c2ccc2d4609e354a9"
+		},
+		{
+			"ImportPath": "github.com/docker/libkv",
+			"Comment": "v0.1.0-19-g72fa504",
+			"Rev": "72fa5044dca31fb5dc26c6d8e3bab22b50eeb0a6"
+		},
+		{
+			"ImportPath": "github.com/ugorji/go/codec",
+			"Rev": "a396ed22fc049df733440d90efe17475e3929ccb"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "d5cd7348bfebdf7dbb6dbb18fa488525f9024293"
+		}
+	]
+}
