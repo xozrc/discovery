@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/codegangsta/cli"
+	"github.com/xozrc/discovery/version"
 )
 
 var (
@@ -17,8 +18,13 @@ var (
 
 func Start() {
 	app := cli.NewApp()
-	app.Name = "discoverycli"
-	app.Usage = "discoveryctl [global options] command [command options] [arguments...]."
+	app.Name = "disocvery"
+	app.Usage = "disocvery [global options] command [command options] [arguments...]."
+	app.Version = version.VERSION + " (" + version.GITCOMMIT + ")"
+
+	app.Author = ""
+	app.Email = ""
+
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:        "cluster-store,C",
