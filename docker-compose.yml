@@ -1,0 +1,49 @@
+version: '2'
+
+services:
+ web:
+    build: 
+        context: ./
+        dockerfile: Dockerfile
+    env_file: 
+        - ./env/web.env
+    expose:
+        - "${WEB_PORT}"
+    ports:
+        - "${WEB_PORT}:${WEB_PORT}"
+    volumes:
+        #code sync
+        - ./:/go/src/github.com/web/
+        #log sync 
+        
+    depends_on: 
+        - redis
+        - nsq
+        - nsqlookup
+ redis:
+    image: redis
+    env_file: 
+        - ./env/redis.env
+ nsqlookup:
+    image: nsqio/nsq
+    command: /nsqlookupd
+    ports:
+        - "4160:4160"
+        - "4161:4161"
+    env_file: 
+        - ./env/nsq.env
+ nsq:
+    image: nsqio/nsq
+    command: /nsqd
+    ports:
+        - "4150:4150"
+        - "4151:4151"
+    env_file: 
+        - ./env/nsq.env
+ nsqadmin:
+    image: nsqio/nsq
+    command: /nsqadmin --lookupd-http-address=192.168.99.100:4160
+    ports:
+        - "4171:4171"
+    env_file: 
+        - ./env/nsq.env
